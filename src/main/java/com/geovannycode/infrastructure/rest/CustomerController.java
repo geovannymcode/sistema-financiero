@@ -1,5 +1,6 @@
 package com.geovannycode.infrastructure.rest;
 
+import com.geovannycode.application.dto.CustomerDTO;
 import com.geovannycode.domain.exception.CustomerHasAccountsException;
 import com.geovannycode.domain.exception.UnderageCustomerException;
 import com.geovannycode.domain.model.Customer;
@@ -27,46 +28,32 @@ public class CustomerController {
     private final CustomerUseCase customerUseCase;
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@Valid @RequestBody Customer customer) {
-        try {
-            return new ResponseEntity<>(customerUseCase.createCustomer(customer), HttpStatus.CREATED);
-        } catch (UnderageCustomerException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
+        return new ResponseEntity<>(customerUseCase.createCustomer(customerDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customer) {
-        try {
-            return ResponseEntity.ok(customerUseCase.updateCustomer(id, customer));
-        } catch (UnderageCustomerException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<CustomerDTO> updateCustomer(
+            @PathVariable Long id,
+            @Valid @RequestBody CustomerDTO customerDTO) {
+        return ResponseEntity.ok(customerUseCase.updateCustomer(id, customerDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
-        try {
-            customerUseCase.deleteCustomer(id);
-            return ResponseEntity.noContent().build();
-        } catch (CustomerHasAccountsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        customerUseCase.deleteCustomer(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
         return customerUseCase.findCustomerById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> listCustomers() {
+    public ResponseEntity<List<CustomerDTO>> listCustomers() {
         return ResponseEntity.ok(customerUseCase.listCustomers());
     }
 }
