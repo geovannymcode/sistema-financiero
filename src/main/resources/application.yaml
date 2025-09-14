@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: bank-application
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bankdb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Configuración de logging
+logging:
+  level:
+    root: INFO
+    com.bank: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO
+  file:
+    name: logs/bank-application.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Configuración personalizada de la aplicación
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:your-secret-key-here-with-at-least-64-characters-length-for-security}
+      expiration: 86400000  # 24 horas en milisegundos
