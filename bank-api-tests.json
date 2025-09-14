@@ -1,0 +1,1107 @@
+{
+  "info": {
+    "_postman_id": "8e4f9d72-5c34-4b8a-9f29-7f7e9dc0e5c1",
+    "name": "Bank API Tests",
+    "description": "Pruebas para la API del sistema bancario",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"token\", jsonData.token);",
+                  "",
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains token\", function() {",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Autenticación para obtener el token JWT"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints de autenticación"
+    },
+    {
+      "name": "2. Clientes",
+      "item": [
+        {
+          "name": "Crear Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"customerId\", jsonData.id);",
+                  "",
+                  "pm.test(\"Status code is 201\", function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Cliente creado correctamente\", function() {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.firstName).to.eql('John');",
+                  "    pm.expect(jsonData.lastName).to.eql('Doe');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"123456789\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"birthDate\": \"1990-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "customers"
+              ]
+            },
+            "description": "Crear un nuevo cliente"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Cliente por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Cliente obtenido correctamente\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"customerId\")));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Obtener un cliente por su ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todos los Clientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta es un array\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "customers"
+              ]
+            },
+            "description": "Listar todos los clientes"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Cliente actualizado correctamente\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.firstName).to.eql('Jane');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"123456789\",\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Doe\",\n    \"email\": \"jane.doe@example.com\",\n    \"birthDate\": \"1990-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Actualizar datos de un cliente"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Cliente Menor de Edad (Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"987654321\",\n    \"firstName\": \"Minor\",\n    \"lastName\": \"User\",\n    \"email\": \"minor@example.com\",\n    \"birthDate\": \"2010-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "customers"
+              ]
+            },
+            "description": "Intentar crear un cliente menor de edad (debe fallar)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para administración de clientes"
+    },
+    {
+      "name": "3. Cuentas",
+      "item": [
+        {
+          "name": "Crear Cuenta de Ahorros",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"savingsAccountId\", jsonData.id);",
+                  "pm.environment.set(\"savingsAccountNumber\", jsonData.accountNumber);",
+                  "",
+                  "pm.test(\"Status code is 201\", function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Cuenta creada correctamente\", function() {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.accountType).to.eql('SAVINGS');",
+                  "    pm.expect(jsonData.status).to.eql('ACTIVE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"accountType\": \"SAVINGS\",\n    \"gmfExempt\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Crear una cuenta de ahorros para un cliente"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Cuenta Corriente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"checkingAccountId\", jsonData.id);",
+                  "pm.environment.set(\"checkingAccountNumber\", jsonData.accountNumber);",
+                  "",
+                  "pm.test(\"Status code is 201\", function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Cuenta creada correctamente\", function() {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.accountType).to.eql('CHECKING');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"accountType\": \"CHECKING\",\n    \"gmfExempt\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Crear una cuenta corriente para un cliente"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Cuenta por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Cuenta obtenida correctamente\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"savingsAccountId\")));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/{{savingsAccountId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "{{savingsAccountId}}"
+              ]
+            },
+            "description": "Obtener una cuenta por su ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Cuenta por Número",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Cuenta obtenida correctamente\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('accountNumber');",
+                  "    pm.expect(jsonData.accountNumber).to.eql(pm.environment.get(\"savingsAccountNumber\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/number/{{savingsAccountNumber}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "number",
+                "{{savingsAccountNumber}}"
+              ]
+            },
+            "description": "Obtener una cuenta por su número"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Cuentas de un Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta es un array\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(2); // Al menos dos cuentas (ahorros y corriente)",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Listar todas las cuentas de un cliente"
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar Estado de Cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Estado de cuenta actualizado correctamente\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('INACTIVE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/{{checkingAccountId}}/status?status=INACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "{{checkingAccountId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "INACTIVE"
+                }
+              ]
+            },
+            "description": "Cambiar el estado de una cuenta"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para administración de cuentas"
+    },
+    {
+      "name": "4. Transacciones",
+      "item": [
+        {
+          "name": "Realizar Depósito",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"depositTransactionId\", jsonData.id);",
+                  "",
+                  "pm.test(\"Status code is 201\", function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Depósito realizado correctamente\", function() {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.transactionType).to.eql('DEPOSIT');",
+                  "    pm.expect(jsonData.amount).to.eql(500);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"transactionType\": \"DEPOSIT\",\n    \"amount\": 500,\n    \"destinationAccountNumber\": \"{{savingsAccountNumber}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Realizar un depósito en una cuenta"
+          },
+          "response": []
+        },
+        {
+          "name": "Realizar Retiro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"withdrawalTransactionId\", jsonData.id);",
+                  "",
+                  "pm.test(\"Status code is 201\", function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Retiro realizado correctamente\", function() {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.transactionType).to.eql('WITHDRAWAL');",
+                  "    pm.expect(jsonData.amount).to.eql(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"transactionType\": \"WITHDRAWAL\",\n    \"amount\": 200,\n    \"sourceAccountNumber\": \"{{savingsAccountNumber}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Realizar un retiro de una cuenta"
+          },
+          "response": []
+        },
+        {
+          "name": "Realizar Transferencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"transferTransactionId\", jsonData.id);",
+                  "",
+                  "pm.test(\"Status code is 201\", function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Transferencia realizada correctamente\", function() {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.transactionType).to.eql('TRANSFER');",
+                  "    pm.expect(jsonData.amount).to.eql(100);",
+                  "    pm.expect(jsonData.sourceAccountNumber).to.eql(pm.environment.get(\"savingsAccountNumber\"));",
+                  "    pm.expect(jsonData.destinationAccountNumber).to.eql(pm.environment.get(\"checkingAccountNumber\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"transactionType\": \"TRANSFER\",\n    \"amount\": 100,\n    \"sourceAccountNumber\": \"{{savingsAccountNumber}}\",\n    \"destinationAccountNumber\": \"{{checkingAccountNumber}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Realizar una transferencia entre cuentas"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Transacción por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Transacción obtenida correctamente\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"transferTransactionId\")));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/{{transferTransactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions",
+                "{{transferTransactionId}}"
+              ]
+            },
+            "description": "Obtener una transacción por su ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Transacciones de una Cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta es un array\", function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(2); // Al menos dos transacciones (depósito y transferencia)",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/accounts/{{savingsAccountNumber}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions",
+                "accounts",
+                "{{savingsAccountNumber}}"
+              ]
+            },
+            "description": "Listar todas las transacciones de una cuenta"
+          },
+          "response": []
+        },
+        {
+          "name": "Retiro con Fondos Insuficientes (Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"transactionType\": \"WITHDRAWAL\",\n    \"amount\": 10000,\n    \"sourceAccountNumber\": \"{{savingsAccountNumber}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions"
+              ]
+            },
+            "description": "Intentar realizar un retiro con fondos insuficientes (debe fallar)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para transacciones financieras"
+    },
+    {
+      "name": "5. Escenarios de Error",
+      "item": [
+        {
+          "name": "Intentar Eliminar Cliente con Cuentas (Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function() {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Intentar eliminar un cliente con cuentas (debe fallar)"
+          },
+          "response": []
+        },
+        {
+          "name": "Intentar Cancelar Cuenta con Saldo (Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/{{savingsAccountId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "{{savingsAccountId}}"
+              ]
+            },
+            "description": "Intentar cancelar una cuenta con saldo (debe fallar)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Pruebas de escenarios de error esperados"
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
