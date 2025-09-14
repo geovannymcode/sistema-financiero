@@ -37,5 +37,5 @@ logging:
 app:
   security:
     jwt:
-      secret: ${JWT_SECRET:your-secret-key-here-with-at-least-64-characters-length-for-security}
+      secret: ${JWT_SECRET:dda0d528aac24db68ee9b057391d40f07e9c8a5fb23f4c1d9a76e540bf31a05c}
       expiration: 86400000  # 24 horas en milisegundos
