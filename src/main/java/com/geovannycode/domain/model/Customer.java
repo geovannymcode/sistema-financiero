@@ -40,29 +40,21 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Identification type is required")
     @Column(name = "identification_type", nullable = false)
     private String identificationType;
 
-    @NotBlank(message = "Identification number is required")
     @Column(name = "identification_number", nullable = false, unique = true)
     private String identificationNumber;
 
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, message = "First name must have at least 2 characters")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, message = "Last name must have at least 2 characters")
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Email(message = "Must be a valid email address")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Past(message = "Birth date must be in the past")
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
@@ -75,6 +67,18 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = false)
     private final List<Account> accounts = new ArrayList<>();
 
+    @Builder
+    public Customer(Long id, String identificationType, String identificationNumber,
+                    String firstName, String lastName, String email, LocalDate birthDate) {
+        this.id = id;
+        this.identificationType = identificationType;
+        this.identificationNumber = identificationNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.birthDate = birthDate;
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -85,7 +89,6 @@ public class Customer {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 
     public void updateInfo(String identificationType, String identificationNumber,
                            String firstName, String lastName, String email, LocalDate birthDate) {

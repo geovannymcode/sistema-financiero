@@ -41,15 +41,15 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "account_type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "account_type", nullable = false)
     private AccountType accountType;
 
     @Column(name = "account_number", nullable = false, unique = true, length = 10)
     private String accountNumber;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private AccountStatus status;
 
     @Column(nullable = false)
@@ -73,6 +73,19 @@ public class Account {
 
     @OneToMany(mappedBy = "destinationAccount")
     private final List<Transaction> incomingTransactions = new ArrayList<>();
+
+    @Builder
+    public Account(Long id, AccountType accountType, String accountNumber,
+                   AccountStatus status, BigDecimal balance, Boolean gmfExempt,
+                   Customer customer) {
+        this.id = id;
+        this.accountType = accountType;
+        this.accountNumber = accountNumber;
+        this.status = status;
+        this.balance = balance;
+        this.gmfExempt = gmfExempt;
+        this.customer = customer;
+    }
 
     @PrePersist
     protected void onCreate() {

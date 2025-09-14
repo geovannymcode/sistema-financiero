@@ -1,5 +1,6 @@
 package com.geovannycode.domain.model;
 
+import com.geovannycode.domain.model.enums.TransactionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,8 +36,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "transaction_type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
 
     @Column(nullable = false)
@@ -52,6 +53,16 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "destination_account_id")
     private Account destinationAccount;
+
+    @Builder
+    public Transaction(Long id, TransactionType transactionType, BigDecimal amount,
+                       Account sourceAccount, Account destinationAccount) {
+        this.id = id;
+        this.transactionType = transactionType;
+        this.amount = amount;
+        this.sourceAccount = sourceAccount;
+        this.destinationAccount = destinationAccount;
+    }
 
     @PrePersist
     protected void onCreate() {
