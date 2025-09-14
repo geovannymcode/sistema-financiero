@@ -1,0 +1,8 @@
+{
+  "identificationType": "CC",
+  "identificationNumber": "123456789",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "birthDate": "1990-01-15"
+}

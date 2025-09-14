@@ -5,6 +5,7 @@ import com.geovannycode.domain.model.enums.AccountType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @Getter
 @ToString
 @EqualsAndHashCode
+@Builder(toBuilder = true)
 public class AccountDTO {
 
     private final Long id;
